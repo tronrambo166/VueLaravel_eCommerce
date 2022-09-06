@@ -1,7 +1,8 @@
 @extends('layout')
 
 @section('page')
-    <div class="container">
+    <div class="container" id="content">
+         <ExampleComponent> </ExampleComponent>
         <div class="heading">
                     <h5 class="mb-5 bg-light text-center text-dark">Best Selling Now</h5> 
                 </div>

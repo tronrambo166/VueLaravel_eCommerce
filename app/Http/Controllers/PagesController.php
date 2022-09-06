@@ -28,7 +28,7 @@ class PagesController extends Controller
            $newproduct=DB:: table('products')->get(); */
 
            $images=Images::get();
-         $product=Products::orderBy('id', 'DESC')->get();
+           $product=Products::orderBy('id', 'DESC')->get();
            $newproduct=Products::get();
 
          return  view('home', compact('product','images','newproduct'));
@@ -39,6 +39,7 @@ class PagesController extends Controller
      public function products(){
         $images=Images::get();
          $product=Products::orderBy('id', 'DESC')->get();
+        //return $product=Products::with('category')->get();
         return view('products', compact('product','images'));
         
     }

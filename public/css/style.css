@@ -1,14 +1,14 @@
 {margin:0;padding:0}
 
 
-    /*Calling Fonts*/
+   /* /*Calling Fonts*/
 	
 	@font-face{
 		
 		font-family:'OpenSans';
 		src: url('font/OpenSans-Regular.eot') format('eot'),
-		 url('font/OpenSans-Regular.woff') format('woff'),
-		  url('font/OpenSans-Regular.ttf') format('truetype'),
+		
+		 
 		   url('font/OpenSans-Regular.svg') format('svg');
 		
 	}
@@ -37,8 +37,7 @@
 		
 		font-family:'OpenSans-ExtraBold';
 		src: url('font/OpenSans-ExtraBold.eot') format('eot'),
-		 url('font/OpenSans-ExtraBold.woff') format('woff'),
-		  url('font/OpenSans-ExtraBold.ttf') format('truetype'),
+		
 		   url('font/OpenSans-ExtraBold.svg') format('svg');
 		
 	}
