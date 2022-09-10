@@ -1,7 +1,7 @@
-export const routes=[
-{ path:'/dash', component: dash },
-{ path:'/products', component: products},
-{ path:'/brands', component: brands},
-{ path:'/homee', component: home},
+
+import home from '../components/home.vue';
+
+export default const routes=[
+{ path:'/home', component: home },
 
 ];

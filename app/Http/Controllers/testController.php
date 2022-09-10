@@ -15,7 +15,7 @@ class testController extends Controller
 
 	
  public function login() {
-    return view('auth.login');
+    return view('home');
 }
 
 

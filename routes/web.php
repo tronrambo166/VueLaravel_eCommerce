@@ -15,13 +15,13 @@ use App\Http\Controllers\testController;
 |
 */
 
-Route::get('/', 'testController@login'); 
+Route::get('/', 'PagesController@home'); 
 Route::get('forgot/{remail}', 'testController@forgot')->name('forgot');
 Route::post('send_reset_email', 'testController@send_reset_email')->name('send_reset_email');
 Route::post('reset/{remail}', 'testController@reset')->name('reset');
 
 
-//Route::get('{anypath}', 'testController@home')->where('path', '.*');
+Route::get('{anypath}', 'PagesController@home')->where('path', '.*');
 
 Auth::routes();
 

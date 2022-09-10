@@ -8,9 +8,8 @@
      <link rel="stylesheet"href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/5.15.3/css/all.min.css"/>
     <link rel="stylesheet" href="https://stackpath.bootstrapcdn.com/bootstrap/4.4.1/css/bootstrap.min.css">
 
-
     <link href="{{ asset('/css/style.css') }}" rel="stylesheet" type="text/css" media="all"/>
-    <link href="={{ asset('/css/menu.css') }}" rel="stylesheet" type="text/css" media="all"/>
+    
     
     
     <link href='http://fonts.googleapis.com/css?family=Monda' rel='stylesheet' type='text/css'>
@@ -21,22 +20,25 @@
    <link href="{{ asset('/css/app.css') }}" rel="stylesheet">
 
     
-{{-- Vue component files --}}
+<!-- {{-- Vue component files --}}
 <script src="https://unpkg.com/vue"></script>
 <script src="https://unpkg.com/http-vue-loader"></script>
-  {{-- Vue component files --}}
+  {{-- Vue component files --}} -->
   
 </head>
 <body>
-<div class="container" >
+
+     
+
+<div class="app container" >
     
-  
+ 
     
-    <div class="row">
+    <div class="row ">
     
     <div class="col-sm-8"> 
       
-            <div class="navbar navbar-expand-sm bg-light p-0 w-100 navy text-center">
+         {{--   <div class="navbar navbar-expand-sm bg-light p-0 w-100 navy text-center">
                 <ul class="navbar-nav m-auto">
                     <li class="nav-item py-1 px-3 bg-light border-right "><a href="{{ url('home') }}" class="text-dark nav-link">HOME</a></li>
 
@@ -49,7 +51,24 @@
 
                     <li class="nav-item py-1 px-3 bg-light border-right"><a href="{{ route('contact') }}" class="text-dark nav-link">CONTACT</a></li>
                 </ul>
+            </div> --}}
+
+            <div class="navbar navbar-expand-sm bg-light p-0 w-100 navy text-center">
+                <ul class="navbar-nav m-auto">
+                    <li class="nav-item py-1 px-3 bg-light border-right "><router-link to="/home" class=" nav-link">HOME</router-link></li>
+
+                    <li class="nav-item py-1 px-3 bg-light border-right"><router-link to="/products" class=" nav-link">PRODUCTS
+                    </router-link></li>
+
+                    <li class="nav-item py-1 px-3 bg-light border-right"><router-link to="/brands" class=" nav-link">TOP BRANDS</router-link></li>
+
+                    <li class="nav-item py-1 px-3 bg-light border-right"><router-link to="/cart" class=" nav-link">CART</router-link></li>
+
+
+                    <li class="nav-item py-1 px-3 bg-light border-right"><router-link to="contacts" class=" nav-link">CONTACT</router-link></li>
+                </ul>
             </div>
+
                   </div>
 
     
@@ -110,14 +129,20 @@
         
     </div>
     
+
+    <div class=" mt-5"> 
+    <router-view></router-view>
+     </div>
+
     
     </div>
-    </div> </div>
+ 
     
 
 
 
-    @yield('page')
+
+   <!-- @yield('page') -->
 
 
 <div class="container-fluid two bg-light mt-5 ">
@@ -177,16 +202,19 @@
 <script src="https://cdn.jsdelivr.net/npm/popper.js@1.16.0/dist/umd/popper.min.js" integrity="sha384-Q6E9RHvbIyZFJoft+2mJbHaEWldlvI9IOYy5n3zV9zzTtmI3UksdQRVvoxMfooAo" crossorigin="anonymous"></script>
 <script src="https://stackpath.bootstrapcdn.com/bootstrap/4.4.1/js/bootstrap.min.js" integrity="sha384-wfSDF2E50Y2D1uUdj0O3uMBJnjuUD4Ih7YwaYd1iqfktj0Uod8GCExl3Og8ifwB6" crossorigin="anonymous"></script>
     
-
-{{-- Vue files --}}
-<script src="https://cdn.jsdelivr.net/npm/vue@2/dist/vue.js"></script>  
-<script src="https://cdnjs.cloudflare.com/ajax/libs/axios/0.23.0/axios.min.js"></script>
+<script type="text/javascript" src="js/app.js"></script>
+ <!-- {{-- Vue files --}}
+ <script type="text/javascript" src="js/app.js"></script>
+<script type="text/javascript" src="https://cdn.jsdelivr.net/npm/vue@2/dist/vue.js"></script>  
+<script type="text/javascript" src="https://cdnjs.cloudflare.com/ajax/libs/axios/0.23.0/axios.min.js"></script>
 
 <script type="text/javascript" src="js/vue-router.js"></script>
-<script type="module" src="js/routerCode.js"></script>
-{{-- Vue files --}}
+<script type="text/javascript" src="js/routerCode.js"></script>
+{{-- Vue files --}}  -->
 
-
+<script type="text/javascript">
+    
+</script>
 
 
 
