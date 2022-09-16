@@ -4,30 +4,69 @@ const VueRouter = require('./vue-router');
 window.Vue = require('vue').default;
 console.log('app js');
 
-// const files = require.context('./', true, /\.vue$/i)
-// files.keys().map(key => Vue.component(key.split('/').pop().split('.')[0], files(key).default))
-
-//Vue.component('example-component', require('./components/ExampleComponent.vue').default);
 //import * as VueRouter from 'vue-router';
 Vue.use(VueRouter);
+
+//VUEX
+import Vuex from 'vuex'
+Vue.use(Vuex);
+import storeData from './store/store'
+const store = new Vuex.Store(
+  storeData
+);
+//VUEX
 
 // routes
 import {routes} from './routes/routes';
 // routes
 
 const router = new VueRouter({
-routes, mode:'history',
-base:"laravel_projects/Vue_eCommerce/public", 
+routes, //mode:'history',
+base:"/laravel_projects/Vue_eCommerce/public/admin", 
 });
 
 Vue.component('example-component', require('./components/ExampleComponent.vue').default);
 
-//const  app = new Vue({ router }).$mount('.content2');
-const app = new Vue({
-el: '.app',
-router
+//const  app = new Vue({ router }).$mount('.admin');
+//SWEET alert
+import Swal from 'sweetalert2'
+window.Swal = Swal;
+const Toast = Swal.mixin({
+  toast: true,
+  position: 'top-end',
+  showConfirmButton: false,
+  timer: 3000,
+  timerProgressBar: true,
+  didOpen: (toast) => {
+    toast.addEventListener('mouseenter', Swal.stopTimer)
+    toast.addEventListener('mouseleave', Swal.resumeTimer)
+  }
+});
+window.Toast = Toast;
+//SWEET alert
+
+//TOASTR
+//import toastr from 'toastr'
+//window.toastr = toastr;
+//TOASTR
+
+//MOMENT
+import moment from 'moment'
+Vue.filter('time', (a) => {
+  return moment(a,'YYYYMMDD').fromNow();
+});
+Vue.filter('substr', (a,b) => {
+  return a.substr(0,b);
+});
+//MOMENT
+
+import Form from 'vform'
+window.Form = Form;
+
+const app2 = new Vue({
+el: '.admin',
+router, store
 //components: {       'expcomp': httpVueLoader('js/components/ExampleComponent.vue'), },       
 });
-
 
 

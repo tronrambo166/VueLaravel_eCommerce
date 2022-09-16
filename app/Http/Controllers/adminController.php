@@ -25,10 +25,10 @@ class AdminController extends Controller
 
          $credentials = $request->only('email','password','remember');
         
-        if(Auth::guard('admin')->attempt($credentials)){
-            $request->session()->regenerate();
+       // if(Auth::guard('admin')->attempt($credentials)){
+           // $request->session()->regenerate();
             return redirect()->intended('admin');
-        }
+        //}
         return redirect("admin/login")->with('success','Login details are not valid');
 
     }
@@ -159,7 +159,7 @@ public function editprofile()
 
  public function addcategory()
 
-    {
+    {   return view('admin.options.addcat');
         return view('admin.options.addcat');
        // , compact('users'));
        
@@ -169,14 +169,11 @@ public function editprofile()
 
       public function savecat(Request $cat)
 
-    {
-          $cat->validate([
-           'name'=> 'required|unique:categories,cat_name' ],
-
-           [
-            'name.required'=> 'Please Enter Category Name!'     
-           ]);
-
+    {     //return $cat;
+          $cat->validate(
+            [ 'catName'=> 'required|unique:categories,cat_name' ],
+            [ 'catName.required'=> 'Please Enter Category Name!'     ]
+        );
 
           /* Eloquent ORM
           $category=new Categories();
@@ -184,9 +181,11 @@ public function editprofile()
           $category->save(); */
 
 
-    	$insert= array('cat_name' => $cat->name);
+    	$insert= array();
+        $insert['cat_name']=$cat->catName;
+        $insert['status']=$cat->status;
         DB:: table('categories')->insert($insert);
-        return back()->with('success', "Category Added!");
+        return "Category Added!";
        // , compact('users'));
        
     }
@@ -208,25 +207,25 @@ public function editprofile()
 
     {
           $pro->validate([
-           'name'=> 'required|unique:products,pro_name',
+           'pro_name'=> 'required|unique:products,pro_name',
            'cat_id'=> 'required',
            'brand_id'=> 'required',
           // 'description'=> 'required',
-           'price'=> 'required',
-           'image.*'=> 'required|mimes:jpg,jpeg,png' 
+           'price'=> 'required'
+           //'image.*'=> 'required|mimes:jpg,jpeg,png' 
             ],
 
            [
-            'name.required'=> 'Please Enter Product Name!'  ,
+            'pro_name.required'=> 'Please Enter Product Name!'  ,
                'cat_id.required'=> 'Please Select a Category!'  ,
-                  'brand_id.required'=> 'Please Select a Brand!'  ,
-                  'image.required'=> 'Please Select at least one Image!'  ,
-            'image.mimes'=> 'Format other that JPG,JPEG,PNG not accepted!'        
+                  'brand_id.required'=> 'Please Select a Brand!'  
+                  //'image.required'=> 'Please Select at least one Image!'  
+            //'image.mimes'=> 'Format other that JPG,JPEG,PNG not accepted!'        
            ]);
 
 
-                     //SINGLE IMG
-              //$image=$pro->file('image');
+        //SINGLE IMG
+          //$image=$pro->file('image');
           //$uniqid=hexdec(uniqid());
           //$ext=strtolower($image->getClientOriginalExtension());
           //$create_name=$uniqid.'.'.$ext;
@@ -236,20 +235,21 @@ public function editprofile()
            //$final_img=$loc.$create_name;
 
 
-           //GETTING form data
+        //GETTING form data
           $data=array();
-          $data['pro_name']=$pro->name;
+          $data['pro_name']=$pro->pro_name;
           $data['cat_id']=$pro->cat_id;
           $data['brand_id']=$pro->brand_id;
-          //$data['description']=$pro->description;
+          $data['description']=$pro->desc;
+          $data['r_quantity']=$pro->qty;
+          $data['status']=$pro->status;
           $data['price']=$this->clean($pro->price);
           //$data['image']="Not Available!";
 
         DB:: table('products')->insert($data);
 
         //GETTING IMAGES
-          $image=$pro->file('image'); //print_r($image);
-
+         /* $image=$pro->file('image'); //print_r($image);
           if($image) {
           foreach ($image as $single_img) { 
             # code...
@@ -268,11 +268,10 @@ public function editprofile()
            DB::table('images')->insert(array('image_name' => $final_img,
             'product_id'=>$pro_id ));
 
-             } }
+             } } */
 
 
-        return back()->with('success', "Product Added!");
-       // , compact('users'));
+        return response()->json(['success' => "Product Added!"]);
        
     }
 
@@ -289,9 +288,9 @@ public function editprofile()
 
      public function mancat()
 
-    {
-    	 $cat= DB:: table('categories')->get();
-        return view('admin.options.mancat' , compact('cat'));
+    {    
+    	 $cat= DB:: table('categories')->get();   
+        return response()->json([ 'data' => $cat ]); //view('admin.options.mancat' , compact('cat'));
        
     }
 
@@ -307,7 +306,7 @@ public function editprofile()
 
             $images= DB:: table('images')->get();
 
-        return view('admin.options.manpro', compact('product', 'images'));
+       return response()->json([ 'product' => $product, 'images' => $images  ]);
        
     }
 
@@ -317,7 +316,7 @@ public function editprofile()
 
     {
         $editcat= DB:: table('categories')->where('id',$id)->get();
-        return view('admin.options.editcat', compact('editcat'));
+        return response()->json(['data' => $editcat]);
        
     }
 
@@ -354,10 +353,12 @@ public function editprofile()
      public function upcat(Request $cat,$id)
 
     {
-         $data=array();  $data['cat_name']=$cat->name;
+         $data=array(); 
+          $data['cat_name']=$cat->catName;
+          $data['status']=$cat->status;
 
         DB:: table('categories')->where('id',$id)->update($data);
-        return redirect('admin/manage-category')->with('success', "Category Updated!");
+       return response()->json(['message' => 'Update Changed!']);
        
     }
 
@@ -462,27 +463,30 @@ public function editprofile()
 
      public function delcat($id)
 
-    {
+    {   
         DB::table('categories')->where('id',$id)->delete();
-        return redirect('admin/manage-category')->with('success', 'Category Deleted!');
+        return response()->json([ 'status'=>200, 'message'=>'Suceess!' ]);
        
        
     }
 
      public function delpro($id)
 
-    {    $img=DB::table('images')->where('product_id',$id)->get(); $count=0;
-            foreach($img as $img_loc){ 
+    {   
+
+    /* $img=DB::table('images')->where('product_id',$id)->get(); $count=0;
+            
+        foreach($img as $img_loc){ 
          $img_loc=$img_loc->image_name;
 
          if(file_exists($img_loc))    
          unlink($img_loc); $count++;
-     }
-         DB::table('images')->where('product_id',$id)->delete();
+     } */
+        // DB::table('images')->where('product_id',$id)->delete();
          DB::table('products')->where('id',$id)->delete();
                
 
-        return redirect('admin/manage-product')->with('success', $count.' Images Deleted!');
+       return response()->json([ 'status'=>200, 'message'=>'Suceess!' ]);
        
     }
 
