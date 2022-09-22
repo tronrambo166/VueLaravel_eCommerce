@@ -51,10 +51,11 @@ Route::post('admin/save-category', 'AdminController@savecat');
 Route::post('admin/save-product', 'AdminController@saveproduct')->name('saveproduct');
 
 Route::post('admin/upcat/{id}', 'AdminController@upcat')->name('upcat');
-Route::post('/uppro/{id}', 'AdminController@uppro')->name('uppro');
+Route::post('admin/uppro/{id}', 'AdminController@uppro')->name('uppro');
 
 Route::get('/delbrand/{id}', 'AdminController@delbrand')->name('delbrand');
-Route::get('/delcat/{id}', 'AdminController@delcat');//->name('delcat');
+Route::get('/delcat/{id}', 'AdminController@delcat');
+Route::post('/delcats', 'AdminController@delcats');//->name('delcat');
 Route::get('/delpro/{id}', 'AdminController@delpro');//->name('delpro');
 Route::get('/productStatus/{id}/{status}', 'AdminController@productStatus');////->name('changeStatus');
 Route::get('/ship-order/{id}', 'AdminController@ship_order');

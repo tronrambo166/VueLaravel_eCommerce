@@ -22,8 +22,7 @@ class AdminController extends Controller
             'email' => ['required'],
             'password' => ['required'],
         ]);
-
-         $credentials = $request->only('email','password','remember');
+     $credentials = $request->only('email','password','remember');
         
        // if(Auth::guard('admin')->attempt($credentials)){
            // $request->session()->regenerate();
@@ -205,20 +204,20 @@ public function editprofile()
 
      public function saveproduct(Request $pro)
 
-    {
+    {  
           $pro->validate([
            'pro_name'=> 'required|unique:products,pro_name',
-           'cat_id'=> 'required',
-           'brand_id'=> 'required',
+           //'cat_id'=> 'required',
+           //'brand_id'=> 'required',
           // 'description'=> 'required',
-           'price'=> 'required'
+           //'price'=> 'required'
            //'image.*'=> 'required|mimes:jpg,jpeg,png' 
             ],
 
            [
             'pro_name.required'=> 'Please Enter Product Name!'  ,
-               'cat_id.required'=> 'Please Select a Category!'  ,
-                  'brand_id.required'=> 'Please Select a Brand!'  
+               //'cat_id.required'=> 'Please Select a Category!'  ,
+                //  'brand_id.required'=> 'Please Select a Brand!'  
                   //'image.required'=> 'Please Select at least one Image!'  
             //'image.mimes'=> 'Format other that JPG,JPEG,PNG not accepted!'        
            ]);
@@ -246,31 +245,28 @@ public function editprofile()
           $data['price']=$this->clean($pro->price);
           //$data['image']="Not Available!";
 
-        DB:: table('products')->insert($data);
+          DB:: table('products')->insert($data);
 
-        //GETTING IMAGES
-         /* $image=$pro->file('image'); //print_r($image);
-          if($image) {
-          foreach ($image as $single_img) { 
-            # code...
+     //GETTING IMAGES
+          $single_img=$pro->file('image');  
+         // if($image !='') {
+          //foreach ($image as $single_img) { 
+            # code... 
      
-
           $uniqid=hexdec(uniqid());
           $ext=strtolower($single_img->getClientOriginalExtension());
           $create_name=$uniqid.'.'.$ext;
           $loc='images/product/';
           //Move uploaded file
           $single_img->move($loc, $create_name);
-           $final_img=$loc.$create_name;
+          $final_img=$loc.$create_name;
            //getting product id
-           $pro_id=DB::table('products')->orderBy('id', 'DESC')->first(); $pro_id=($pro_id->id);
-
+           $pro_id=DB::table('products')->orderBy('id', 'DESC')->first(); 
+           $pro_id=($pro_id->id);
            DB::table('images')->insert(array('image_name' => $final_img,
             'product_id'=>$pro_id ));
 
-             } } */
-
-
+           //  } } 
         return response()->json(['success' => "Product Added!"]);
        
     }
@@ -301,7 +297,8 @@ public function editprofile()
     	$product= DB:: table('products')
             ->join('categories', 'products.cat_id', '=', 'categories.id')
             ->join('brands', 'products.brand_id', '=', 'brands.id')
-            ->select('products.*', 'categories.cat_name','brands.brand_name')
+            ->join('images', 'products.id', '=', 'images.product_id')
+            ->select('products.*', 'categories.cat_name','brands.brand_name','images.image_name')
             ->get();
 
             $images= DB:: table('images')->get();
@@ -329,8 +326,7 @@ public function editprofile()
         $brand= DB:: table('brands')->get();
         $cat= DB:: table('categories')->get();
         $editpro=DB::table('products')->where('id',$id)->get();
-        return view('admin.options.editpro', compact('images','editpro','cat','brand' ));
-       
+        return response()->json([ 'editpro' => $editpro, 'images' => $images, 'brand' => $brand, 'cat' => $cat  ]);
     }
 
 
@@ -367,20 +363,20 @@ public function editprofile()
 
     {
          $pro->validate([
-           'name'=> 'required', //|unique:products,pro_name',
-           'cat_id'=> 'required',
-           'brand_id'=> 'required',
+           'pro_name'=> 'required', //|unique:products,pro_name',
+          // 'cat_id'=> 'required',
+           //'brand_id'=> 'required',
           // 'description'=> 'required',
-           'price'=> 'required',
-           'images.*'=> 'required|mimes:jpg,jpeg,png' 
+              'price'=> 'required'
+           //'images.*'=> 'required|mimes:jpg,jpeg,png' 
             ],
 
            [
-               'name.required'=> 'Please Enter Product Name!'  ,
-               'cat_id.required'=> 'Please Select a Category!'  ,
-                  'brand_id.required'=> 'Please Select a Brand!'  ,
-                  'images.required'=> 'Please Select at least one Image!'  ,
-            'images.mimes'=> 'Format other that JPG,JPEG,PNG not accepted!'        
+               'pro_name.required'=> 'Please Enter Product Name!'  ,
+               '//cat_id.required'=> 'Please Select a Category!'  ,
+                  //'brand_id.required'=> 'Please Select a Brand!'  
+                  //'images.required'=> 'Please Select at least one Image!'  ,
+            //'images.mimes'=> 'Format other that JPG,JPEG,PNG not accepted!'        
            ]);
 
 
@@ -397,37 +393,40 @@ public function editprofile()
 
            //GETTING form data
           $data=array();
-          $data['pro_name']=$pro->name;
+          $data['pro_name']=$pro->pro_name;
           $data['cat_id']=$pro->cat_id;
           $data['brand_id']=$pro->brand_id;
-          //$data['description']=$pro->description;
+          $data['description']=$pro->desc;
+          $data['status']=$pro->status;
+           $data['r_quantity']=$pro->qty;
           $data['price']=$this->clean($pro->price);
           //$data['image']="Not Available!";
 
         DB:: table('products')->where('id',$id)->update($data);
+      
 
         //GETTING IMAGES
         $curr_id=DB::table('images')->where('product_id',$id)->first(); $curr_img_id=$curr_id->id;
            $old_img=DB::table('images')->where('product_id',$id)->get(); 
             
-            $image=$pro->file('images'); print_r($image);
+            $image=$pro->file('image'); 
 
           if($image){   $c=1;
 
-         foreach($old_img as $old_img){ 
+        // foreach($old_img as $old_img){ 
          $img_loc=$old_img->image_name;
          if(file_exists($img_loc))  
          unlink($img_loc); 
-         }
+        // }
 
 
-          foreach ($image as $single_img) { 
+        //  foreach ($image as $single_img) { 
           $uniqid=hexdec(uniqid());
-          $ext=strtolower($single_img->getClientOriginalExtension());
+          $ext=strtolower($image->getClientOriginalExtension());
           $create_name=$uniqid.'.'.$ext;
           $loc='images/product/';
           //Move uploaded file
-          $single_img->move($loc, $create_name);
+          $image->move($loc, $create_name);
            $final_img=$loc.$create_name;
            //getting product id
           // $pro_id=DB::table('products')->orderBy('id', 'DESC')->first(); $pro_id=($pro_id->id);
@@ -443,10 +442,11 @@ public function editprofile()
             'product_id' => $id));
             }
 
-            $c++;    } }
+            $c++;   // }
+             }
 
 
-        return redirect('admin/manage-product')->with('success', "Product Updated! Img ID = ".$curr_img_id);
+         return response()->json(['message' => 'Update Changed!']);
        
     }
 
@@ -469,6 +469,19 @@ public function editprofile()
        
        
     }
+
+     public function delcats(Request $req) 
+
+    {    $ids=$req->ids;
+         
+        foreach($ids as $id) 
+            DB::table('categories')->where('id',$id)->delete();
+
+        return response()->json([ 'status'=>200, 'message'=>'Suceess!' ]);
+       
+       
+    }
+
 
      public function delpro($id)
 

@@ -11,7 +11,7 @@
 
 
 		
-		<th> <input class=" mt-2 float-left" type="checkbox"  v-model="catIds"/> Index</th>
+		<!-- <th> <input class=" mt-2 float-left" type="checkbox"  v-model="catIds"/> Index</th> -->
 		 <th>SL</th>
 			<th>Product Name </th>
 			<th>Brand </th>
@@ -19,8 +19,9 @@
 			<th>Desc </th>
 			<th>Price </th>
 			<th>Qty </th>
+				<th>Image </th>
 			<th>Status</th>
-			<th>Image </th>
+		
 			
 			<th class="text-center">Actions</th>
 		
@@ -32,7 +33,7 @@
 	<tbody>
 
 		<tr v-for="( cats, index ) in allpro" >
-		<input type="checkbox" :value="cats.id" v-model="catIds"/>
+			<!-- <input type="checkbox" :value="cats.id" v-model="catIds"/> -->
 		<td>{{++index}}</td>
 			<td>{{cats.pro_name }}</td>
 				<td>{{cats.brand_name }}</td>
@@ -40,11 +41,12 @@
 						<td>{{cats.description }}</td>
 							<td>{{cats.price }}</td>
 								<td>{{cats.r_quantity }}</td>
+								<td><img :src="cats.image_name" width="80px" height="60" /> </td>
 			<td :class=" colStatus(cats.status)"> {{getStatus(cats.status)}}</td>
 			
 			
 			<td class="text-center">
-			<router-link :to="`/edit-category/${cats.id}`" class="py-0 mr-1 btn btn-info">Edit</router-link>
+			<router-link :to="`/edit-product/${cats.id}`" class="py-0 mr-1 btn btn-info">Edit</router-link>
 			<a @click="removePro(cats.id)"  class="py-0 btn btn-danger">Delete</a>
 
 			</td>

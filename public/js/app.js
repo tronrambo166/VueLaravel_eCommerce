@@ -5604,11 +5604,14 @@ __webpack_require__.r(__webpack_exports__);
 //
 //
 //
+//
 /* harmony default export */ const __WEBPACK_DEFAULT_EXPORT__ = ({
   data: function data() {
     return {
       category: {},
       catIds: [],
+      catsAll: false,
+      isSelected: false,
       emptyCat: false
     };
   },
@@ -5655,6 +5658,24 @@ __webpack_require__.r(__webpack_exports__);
         }
       });
     },
+    removeCats: function removeCats(ids) {
+      axios.post('http://localhost/laravel_projects/Vue_eCommerce/public/delcats', {
+        ids: ids
+      }).then(function (data) {
+        console.log(data);
+        toastr.success(data.data.message);
+      })["catch"](function (error) {});
+      this.$store.dispatch("getCats");
+    },
+    selectAll: function selectAll(event) {
+      var _this2 = this;
+
+      if (this.catsAll === false) {
+        this.allcategory.forEach(function (event) {
+          _this2.catIds.push(event.id);
+        });
+      } else this.catIds = [];
+    },
     empCat: function empCat() {
       if (this.$store.state.catData.length < 1) this.emptyCat = true;
     }
@@ -5666,6 +5687,11 @@ __webpack_require__.r(__webpack_exports__);
   computed: {
     allcategory: function allcategory() {
       return this.$store.getters.getCat;
+    }
+  },
+  watch: {
+    catIds: function catIds() {
+      if (this.catIds.length > 0) this.isSelected = true;
     }
   }
 });
@@ -5736,6 +5762,7 @@ function _asyncToGenerator(fn) { return function () { var self = this, args = ar
 //
 //
 //
+//
 /* harmony default export */ const __WEBPACK_DEFAULT_EXPORT__ = ({
   data: function data() {
     return {
@@ -5746,12 +5773,25 @@ function _asyncToGenerator(fn) { return function () { var self = this, args = ar
         brand_id: '',
         price: '',
         qty: '',
-        image: '',
-        status: 0
+        status: 0,
+        image: [],
+        showImage: null
       })
     };
   },
   methods: {
+    handleFile: function handleFile(event) {
+      var t = this;
+      var file = event.target.files[0];
+      this.form.image = file;
+      var filereader = new FileReader();
+
+      filereader.onload = function (e) {
+        t.form.showImage = e.target.result;
+      };
+
+      filereader.readAsDataURL(event.target.files[0]);
+    },
     addCategory: function addCategory() {
       var _this = this;
 
@@ -5833,27 +5873,57 @@ function _asyncToGenerator(fn) { return function () { var self = this, args = ar
 //
 //
 //
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
 /* harmony default export */ const __WEBPACK_DEFAULT_EXPORT__ = ({
   data: function data() {
     return {
       form: new Form({
-        catName: '',
+        pro_name: '',
+        desc: '',
+        cat_id: '',
+        brand_id: '',
+        price: '',
+        qty: '',
+        image: [],
         status: 0
       }),
       thisCat: []
     };
   },
   methods: {
-    showCategory: function showCategory() {
+    handleFile: function handleFile(event) {
+      var file = event.target.files[0];
+      this.form.image = file;
+    },
+    showPro: function showPro() {
       var id = this.$route.params.id;
       var t = this;
-      axios.get('http://localhost/laravel_projects/Vue_eCommerce/public/admin/edit-category/' + id).then(function (response) {
-        t.form.catName = response.data.data[0].cat_name;
-        t.form.status = response.data.data[0].status;
-        console.log(response.data.data);
+      axios.get('http://localhost/laravel_projects/Vue_eCommerce/public/admin/edit-product/' + id).then(function (response) {
+        t.form.pro_name = response.data.editpro[0].pro_name;
+        t.form.desc = response.data.editpro[0].description;
+        t.form.cat_id = response.data.editpro[0].cat_id;
+        t.form.brand_id = response.data.editpro[0].brand_id;
+        t.form.price = response.data.editpro[0].price;
+        t.form.qty = response.data.editpro[0].r_quantity;
+        t.form.status = response.data.editpro[0].status;
+        console.log(response.data);
       });
     },
-    upCategory: function upCategory() {
+    upPro: function upPro() {
       var _this = this;
 
       return _asyncToGenerator( /*#__PURE__*/_regeneratorRuntime().mark(function _callee() {
@@ -5865,14 +5935,14 @@ function _asyncToGenerator(fn) { return function () { var self = this, args = ar
                 id = _this.$route.params.id;
                 t = _this;
                 _context.next = 4;
-                return _this.form.post('http://localhost/laravel_projects/Vue_eCommerce/public/admin/upcat/' + id);
+                return _this.form.post('http://localhost/laravel_projects/Vue_eCommerce/public/admin/uppro/' + id);
 
               case 4:
                 response = _context.sent;
                 console.log(response.data.message);
                 toastr.success(response.data.message);
 
-                _this.$router.push('/manage-category');
+                _this.$router.push('/manage-product');
 
               case 8:
               case "end":
@@ -5884,7 +5954,7 @@ function _asyncToGenerator(fn) { return function () { var self = this, args = ar
     }
   },
   mounted: function mounted() {
-    this.showCategory();
+    this.showPro();
   }
 });
 
@@ -5901,6 +5971,8 @@ __webpack_require__.r(__webpack_exports__);
 /* harmony export */ __webpack_require__.d(__webpack_exports__, {
 /* harmony export */   "default": () => (__WEBPACK_DEFAULT_EXPORT__)
 /* harmony export */ });
+//
+//
 //
 //
 //
@@ -57903,35 +57975,36 @@ var render = function () {
                   {
                     name: "model",
                     rawName: "v-model",
-                    value: _vm.catIds,
-                    expression: "catIds",
+                    value: _vm.catsAll,
+                    expression: "catsAll",
                   },
                 ],
                 staticClass: "mt-2 float-left",
                 attrs: { type: "checkbox" },
                 domProps: {
-                  checked: Array.isArray(_vm.catIds)
-                    ? _vm._i(_vm.catIds, null) > -1
-                    : _vm.catIds,
+                  checked: Array.isArray(_vm.catsAll)
+                    ? _vm._i(_vm.catsAll, null) > -1
+                    : _vm.catsAll,
                 },
                 on: {
+                  click: _vm.selectAll,
                   change: function ($event) {
-                    var $$a = _vm.catIds,
+                    var $$a = _vm.catsAll,
                       $$el = $event.target,
                       $$c = $$el.checked ? true : false
                     if (Array.isArray($$a)) {
                       var $$v = null,
                         $$i = _vm._i($$a, $$v)
                       if ($$el.checked) {
-                        $$i < 0 && (_vm.catIds = $$a.concat([$$v]))
+                        $$i < 0 && (_vm.catsAll = $$a.concat([$$v]))
                       } else {
                         $$i > -1 &&
-                          (_vm.catIds = $$a
+                          (_vm.catsAll = $$a
                             .slice(0, $$i)
                             .concat($$a.slice($$i + 1)))
                       }
                     } else {
-                      _vm.catIds = $$c
+                      _vm.catsAll = $$c
                     }
                   },
                 },
@@ -58036,6 +58109,20 @@ var render = function () {
           ],
           2
         ),
+        _vm._v(" "),
+        _c(
+          "button",
+          {
+            staticClass: "btn btn-warning",
+            attrs: { disabled: !_vm.isSelected },
+            on: {
+              click: function ($event) {
+                return _vm.removeCats(_vm.catIds)
+              },
+            },
+          },
+          [_vm._v("Delete")]
+        ),
       ]
     ),
   ])
@@ -58065,7 +58152,7 @@ var render = function () {
   var _c = _vm._self._c || _h
   return _c("div", { staticClass: "text-center py-4 card" }, [
     _c("h3", { staticClass: "my-4 h3 font-weight-bold" }, [
-      _vm._v("Add Categories  "),
+      _vm._v("Add Product  "),
     ]),
     _vm._v(" "),
     _c(
@@ -58076,6 +58163,311 @@ var render = function () {
           submit: function ($event) {
             $event.preventDefault()
             return _vm.addCategory.apply(null, arguments)
+          },
+          keydown: function ($event) {
+            return _vm.form.onKeydown($event)
+          },
+        },
+      },
+      [
+        _vm._v("\r\n    Name: "),
+        _c("input", {
+          directives: [
+            {
+              name: "model",
+              rawName: "v-model",
+              value: _vm.form.pro_name,
+              expression: "form.pro_name",
+            },
+          ],
+          staticClass: "form-group",
+          attrs: {
+            type: "text",
+            name: "pro_name",
+            placeholder: "Product Name",
+          },
+          domProps: { value: _vm.form.pro_name },
+          on: {
+            input: function ($event) {
+              if ($event.target.composing) {
+                return
+              }
+              _vm.$set(_vm.form, "pro_name", $event.target.value)
+            },
+          },
+        }),
+        _vm._v(" "),
+        _vm.form.errors.has("pro_name")
+          ? _c("div", {
+              staticStyle: { color: "red" },
+              domProps: { innerHTML: _vm._s(_vm.form.errors.get("pro_name")) },
+            })
+          : _vm._e(),
+        _vm._v(" "),
+        _c("br"),
+        _vm._v("\r\n\r\n     Desc: "),
+        _c("textarea", {
+          directives: [
+            {
+              name: "model",
+              rawName: "v-model",
+              value: _vm.form.desc,
+              expression: "form.desc",
+            },
+          ],
+          staticClass: "form-group",
+          attrs: {
+            rows: "3",
+            cols: "32",
+            type: "text",
+            name: "desc",
+            placeholder: "desc",
+          },
+          domProps: { value: _vm.form.desc },
+          on: {
+            input: function ($event) {
+              if ($event.target.composing) {
+                return
+              }
+              _vm.$set(_vm.form, "desc", $event.target.value)
+            },
+          },
+        }),
+        _vm._v(" "),
+        _vm.form.errors.has("desc")
+          ? _c("div", {
+              staticStyle: { color: "red" },
+              domProps: { innerHTML: _vm._s(_vm.form.errors.get("desc")) },
+            })
+          : _vm._e(),
+        _vm._v(" "),
+        _c("br"),
+        _vm._v("\r\n\r\n     Cat Id:  "),
+        _c("input", {
+          directives: [
+            {
+              name: "model",
+              rawName: "v-model",
+              value: _vm.form.cat_id,
+              expression: "form.cat_id",
+            },
+          ],
+          staticClass: "form-group",
+          attrs: { type: "number", name: "cat_id" },
+          domProps: { value: _vm.form.cat_id },
+          on: {
+            input: function ($event) {
+              if ($event.target.composing) {
+                return
+              }
+              _vm.$set(_vm.form, "cat_id", $event.target.value)
+            },
+          },
+        }),
+        _vm._v(" "),
+        _vm.form.errors.has("catName")
+          ? _c("div", {
+              staticStyle: { color: "red" },
+              domProps: { innerHTML: _vm._s(_vm.form.errors.get("catName")) },
+            })
+          : _vm._e(),
+        _vm._v(" "),
+        _c("br"),
+        _vm._v("\r\n\r\n     Brand Id:  "),
+        _c("input", {
+          directives: [
+            {
+              name: "model",
+              rawName: "v-model",
+              value: _vm.form.brand_id,
+              expression: "form.brand_id",
+            },
+          ],
+          staticClass: "form-group",
+          attrs: { type: "number", name: "catName" },
+          domProps: { value: _vm.form.brand_id },
+          on: {
+            input: function ($event) {
+              if ($event.target.composing) {
+                return
+              }
+              _vm.$set(_vm.form, "brand_id", $event.target.value)
+            },
+          },
+        }),
+        _vm._v(" "),
+        _vm.form.errors.has("catName")
+          ? _c("div", {
+              staticStyle: { color: "red" },
+              domProps: { innerHTML: _vm._s(_vm.form.errors.get("catName")) },
+            })
+          : _vm._e(),
+        _vm._v(" "),
+        _c("br"),
+        _vm._v("\r\n\r\n     Price:  "),
+        _c("input", {
+          directives: [
+            {
+              name: "model",
+              rawName: "v-model",
+              value: _vm.form.price,
+              expression: "form.price",
+            },
+          ],
+          staticClass: "form-group",
+          attrs: { type: "number", name: "catName" },
+          domProps: { value: _vm.form.price },
+          on: {
+            input: function ($event) {
+              if ($event.target.composing) {
+                return
+              }
+              _vm.$set(_vm.form, "price", $event.target.value)
+            },
+          },
+        }),
+        _vm._v(" "),
+        _vm.form.errors.has("catName")
+          ? _c("div", {
+              staticStyle: { color: "red" },
+              domProps: { innerHTML: _vm._s(_vm.form.errors.get("catName")) },
+            })
+          : _vm._e(),
+        _c("br"),
+        _vm._v("\r\n\r\n     Qty:  "),
+        _c("input", {
+          directives: [
+            {
+              name: "model",
+              rawName: "v-model",
+              value: _vm.form.qty,
+              expression: "form.qty",
+            },
+          ],
+          staticClass: "mb-2",
+          attrs: { type: "number", name: "qty" },
+          domProps: { value: _vm.form.qty },
+          on: {
+            input: function ($event) {
+              if ($event.target.composing) {
+                return
+              }
+              _vm.$set(_vm.form, "qty", $event.target.value)
+            },
+          },
+        }),
+        _vm._v(" "),
+        _vm.form.errors.has("catName")
+          ? _c("div", {
+              staticStyle: { color: "red" },
+              domProps: { innerHTML: _vm._s(_vm.form.errors.get("catName")) },
+            })
+          : _vm._e(),
+        _c("br"),
+        _vm._v("\r\n\r\n   Image: "),
+        _c("input", {
+          attrs: { multiple: "", type: "file", name: "image[]" },
+          on: { change: _vm.handleFile },
+        }),
+        _vm._v(" "),
+        _c("img", { attrs: { src: _vm.form.showImage, width: "100px" } }),
+        _vm._v(" "),
+        _c("h5", { staticClass: "my-4 h6 font-weight-bold" }, [
+          _vm._v(" Status  "),
+        ]),
+        _vm._v(" "),
+        _c("input", {
+          directives: [
+            {
+              name: "model",
+              rawName: "v-model",
+              value: _vm.form.status,
+              expression: "form.status",
+            },
+          ],
+          staticClass: "form-check-input",
+          attrs: { type: "radio", id: "inactive", value: "0" },
+          domProps: { checked: _vm._q(_vm.form.status, "0") },
+          on: {
+            change: function ($event) {
+              return _vm.$set(_vm.form, "status", "0")
+            },
+          },
+        }),
+        _vm._v(" "),
+        _c("label", { attrs: { for: "inactive" } }, [_vm._v(" Inactive ")]),
+        _vm._v(" "),
+        _c("input", {
+          directives: [
+            {
+              name: "model",
+              rawName: "v-model",
+              value: _vm.form.status,
+              expression: "form.status",
+            },
+          ],
+          staticClass: "mx-3 form-check-input",
+          attrs: { type: "radio", id: "active", value: "1" },
+          domProps: { checked: _vm._q(_vm.form.status, "1") },
+          on: {
+            change: function ($event) {
+              return _vm.$set(_vm.form, "status", "1")
+            },
+          },
+        }),
+        _vm._v(" "),
+        _c("label", { staticClass: "mx-5", attrs: { for: "active" } }, [
+          _vm._v(" Active "),
+        ]),
+        _vm._v(" "),
+        _c(
+          "button",
+          {
+            staticClass: "btn btn-primary",
+            attrs: { type: "submit", disabled: _vm.form.busy },
+          },
+          [_vm._v("\r\n     Save\r\n    ")]
+        ),
+      ]
+    ),
+  ])
+}
+var staticRenderFns = []
+render._withStripped = true
+
+
+
+/***/ }),
+
+/***/ "./node_modules/vue-loader/lib/loaders/templateLoader.js??vue-loader-options!./node_modules/vue-loader/lib/index.js??vue-loader-options!./resources/js/components/admin/products/editpro.vue?vue&type=template&id=05f37183&":
+/*!**********************************************************************************************************************************************************************************************************************************!*\
+  !*** ./node_modules/vue-loader/lib/loaders/templateLoader.js??vue-loader-options!./node_modules/vue-loader/lib/index.js??vue-loader-options!./resources/js/components/admin/products/editpro.vue?vue&type=template&id=05f37183& ***!
+  \**********************************************************************************************************************************************************************************************************************************/
+/***/ ((__unused_webpack_module, __webpack_exports__, __webpack_require__) => {
+
+"use strict";
+__webpack_require__.r(__webpack_exports__);
+/* harmony export */ __webpack_require__.d(__webpack_exports__, {
+/* harmony export */   "render": () => (/* binding */ render),
+/* harmony export */   "staticRenderFns": () => (/* binding */ staticRenderFns)
+/* harmony export */ });
+var render = function () {
+  var _vm = this
+  var _h = _vm.$createElement
+  var _c = _vm._self._c || _h
+  return _c("div", { staticClass: "text-center py-4 card" }, [
+    _c("h3", { staticClass: "my-4 h3 font-weight-bold" }, [
+      _vm._v("Add Categories  "),
+    ]),
+    _vm._v(" "),
+    _c(
+      "form",
+      {
+        staticClass: "form-group",
+        on: {
+          submit: function ($event) {
+            $event.preventDefault()
+            return _vm.upPro.apply(null, arguments)
           },
           keydown: function ($event) {
             return _vm.form.onKeydown($event)
@@ -58251,6 +58643,7 @@ var render = function () {
               expression: "form.qty",
             },
           ],
+          staticClass: "mb-2",
           attrs: { type: "number", name: "qty" },
           domProps: { value: _vm.form.qty },
           on: {
@@ -58270,136 +58663,11 @@ var render = function () {
             })
           : _vm._e(),
         _c("br"),
-        _vm._v(" "),
-        _c("h5", { staticClass: "my-4 h6 font-weight-bold" }, [
-          _vm._v(" Status  "),
-        ]),
-        _vm._v(" "),
+        _vm._v("\r\n\r\n   Image: "),
         _c("input", {
-          directives: [
-            {
-              name: "model",
-              rawName: "v-model",
-              value: _vm.form.status,
-              expression: "form.status",
-            },
-          ],
-          staticClass: "form-check-input",
-          attrs: { type: "radio", id: "inactive", value: "0" },
-          domProps: { checked: _vm._q(_vm.form.status, "0") },
-          on: {
-            change: function ($event) {
-              return _vm.$set(_vm.form, "status", "0")
-            },
-          },
+          attrs: { multiple: "", type: "file", name: "image[]" },
+          on: { change: _vm.handleFile },
         }),
-        _vm._v(" "),
-        _c("label", { attrs: { for: "inactive" } }, [_vm._v(" Inactive ")]),
-        _vm._v(" "),
-        _c("input", {
-          directives: [
-            {
-              name: "model",
-              rawName: "v-model",
-              value: _vm.form.status,
-              expression: "form.status",
-            },
-          ],
-          staticClass: "mx-3 form-check-input",
-          attrs: { type: "radio", id: "active", value: "1" },
-          domProps: { checked: _vm._q(_vm.form.status, "1") },
-          on: {
-            change: function ($event) {
-              return _vm.$set(_vm.form, "status", "1")
-            },
-          },
-        }),
-        _vm._v(" "),
-        _c("label", { staticClass: "mx-5", attrs: { for: "active" } }, [
-          _vm._v(" Active "),
-        ]),
-        _vm._v(" "),
-        _c(
-          "button",
-          {
-            staticClass: "btn btn-primary",
-            attrs: { type: "submit", disabled: _vm.form.busy },
-          },
-          [_vm._v("\r\n     Save\r\n    ")]
-        ),
-      ]
-    ),
-  ])
-}
-var staticRenderFns = []
-render._withStripped = true
-
-
-
-/***/ }),
-
-/***/ "./node_modules/vue-loader/lib/loaders/templateLoader.js??vue-loader-options!./node_modules/vue-loader/lib/index.js??vue-loader-options!./resources/js/components/admin/products/editpro.vue?vue&type=template&id=05f37183&":
-/*!**********************************************************************************************************************************************************************************************************************************!*\
-  !*** ./node_modules/vue-loader/lib/loaders/templateLoader.js??vue-loader-options!./node_modules/vue-loader/lib/index.js??vue-loader-options!./resources/js/components/admin/products/editpro.vue?vue&type=template&id=05f37183& ***!
-  \**********************************************************************************************************************************************************************************************************************************/
-/***/ ((__unused_webpack_module, __webpack_exports__, __webpack_require__) => {
-
-"use strict";
-__webpack_require__.r(__webpack_exports__);
-/* harmony export */ __webpack_require__.d(__webpack_exports__, {
-/* harmony export */   "render": () => (/* binding */ render),
-/* harmony export */   "staticRenderFns": () => (/* binding */ staticRenderFns)
-/* harmony export */ });
-var render = function () {
-  var _vm = this
-  var _h = _vm.$createElement
-  var _c = _vm._self._c || _h
-  return _c("div", { staticClass: "text-center py-4 card" }, [
-    _c("h3", { staticClass: "my-4 h3 font-weight-bold" }, [
-      _vm._v("Add Categories  "),
-    ]),
-    _vm._v(" "),
-    _c(
-      "form",
-      {
-        on: {
-          submit: function ($event) {
-            $event.preventDefault()
-            return _vm.upCategory.apply(null, arguments)
-          },
-          keydown: function ($event) {
-            return _vm.form.onKeydown($event)
-          },
-        },
-      },
-      [
-        _c("input", {
-          directives: [
-            {
-              name: "model",
-              rawName: "v-model",
-              value: _vm.form.catName,
-              expression: "form.catName",
-            },
-          ],
-          attrs: { type: "text", name: "catName" },
-          domProps: { value: _vm.form.catName },
-          on: {
-            input: function ($event) {
-              if ($event.target.composing) {
-                return
-              }
-              _vm.$set(_vm.form, "catName", $event.target.value)
-            },
-          },
-        }),
-        _vm._v(" "),
-        _vm.form.errors.has("catName")
-          ? _c("div", {
-              staticStyle: { color: "red" },
-              domProps: { innerHTML: _vm._s(_vm.form.errors.get("catName")) },
-            })
-          : _vm._e(),
         _vm._v(" "),
         _c("h5", { staticClass: "my-4 h6 font-weight-bold" }, [
           _vm._v(" Status  "),
@@ -58493,116 +58761,13 @@ var render = function () {
       "table",
       { staticClass: "display table table-bordered", attrs: { id: "" } },
       [
-        _c("thead", [
-          _c("tr", [
-            _c("th", [
-              _c("input", {
-                directives: [
-                  {
-                    name: "model",
-                    rawName: "v-model",
-                    value: _vm.catIds,
-                    expression: "catIds",
-                  },
-                ],
-                staticClass: "mt-2 float-left",
-                attrs: { type: "checkbox" },
-                domProps: {
-                  checked: Array.isArray(_vm.catIds)
-                    ? _vm._i(_vm.catIds, null) > -1
-                    : _vm.catIds,
-                },
-                on: {
-                  change: function ($event) {
-                    var $$a = _vm.catIds,
-                      $$el = $event.target,
-                      $$c = $$el.checked ? true : false
-                    if (Array.isArray($$a)) {
-                      var $$v = null,
-                        $$i = _vm._i($$a, $$v)
-                      if ($$el.checked) {
-                        $$i < 0 && (_vm.catIds = $$a.concat([$$v]))
-                      } else {
-                        $$i > -1 &&
-                          (_vm.catIds = $$a
-                            .slice(0, $$i)
-                            .concat($$a.slice($$i + 1)))
-                      }
-                    } else {
-                      _vm.catIds = $$c
-                    }
-                  },
-                },
-              }),
-              _vm._v(" Index"),
-            ]),
-            _vm._v(" "),
-            _c("th", [_vm._v("SL")]),
-            _vm._v(" "),
-            _c("th", [_vm._v("Product Name ")]),
-            _vm._v(" "),
-            _c("th", [_vm._v("Brand ")]),
-            _vm._v(" "),
-            _c("th", [_vm._v("Category ")]),
-            _vm._v(" "),
-            _c("th", [_vm._v("Desc ")]),
-            _vm._v(" "),
-            _c("th", [_vm._v("Price ")]),
-            _vm._v(" "),
-            _c("th", [_vm._v("Qty ")]),
-            _vm._v(" "),
-            _c("th", [_vm._v("Status")]),
-            _vm._v(" "),
-            _c("th", [_vm._v("Image ")]),
-            _vm._v(" "),
-            _c("th", { staticClass: "text-center" }, [_vm._v("Actions")]),
-          ]),
-        ]),
+        _vm._m(0),
         _vm._v(" "),
         _c(
           "tbody",
           [
             _vm._l(_vm.allpro, function (cats, index) {
               return _c("tr", [
-                _c("input", {
-                  directives: [
-                    {
-                      name: "model",
-                      rawName: "v-model",
-                      value: _vm.catIds,
-                      expression: "catIds",
-                    },
-                  ],
-                  attrs: { type: "checkbox" },
-                  domProps: {
-                    value: cats.id,
-                    checked: Array.isArray(_vm.catIds)
-                      ? _vm._i(_vm.catIds, cats.id) > -1
-                      : _vm.catIds,
-                  },
-                  on: {
-                    change: function ($event) {
-                      var $$a = _vm.catIds,
-                        $$el = $event.target,
-                        $$c = $$el.checked ? true : false
-                      if (Array.isArray($$a)) {
-                        var $$v = cats.id,
-                          $$i = _vm._i($$a, $$v)
-                        if ($$el.checked) {
-                          $$i < 0 && (_vm.catIds = $$a.concat([$$v]))
-                        } else {
-                          $$i > -1 &&
-                            (_vm.catIds = $$a
-                              .slice(0, $$i)
-                              .concat($$a.slice($$i + 1)))
-                        }
-                      } else {
-                        _vm.catIds = $$c
-                      }
-                    },
-                  },
-                }),
-                _vm._v(" "),
                 _c("td", [_vm._v(_vm._s(++index))]),
                 _vm._v(" "),
                 _c("td", [_vm._v(_vm._s(cats.pro_name))]),
@@ -58617,6 +58782,16 @@ var render = function () {
                 _vm._v(" "),
                 _c("td", [_vm._v(_vm._s(cats.r_quantity))]),
                 _vm._v(" "),
+                _c("td", [
+                  _c("img", {
+                    attrs: {
+                      src: cats.image_name,
+                      width: "80px",
+                      height: "60",
+                    },
+                  }),
+                ]),
+                _vm._v(" "),
                 _c("td", { class: _vm.colStatus(cats.status) }, [
                   _vm._v(" " + _vm._s(_vm.getStatus(cats.status))),
                 ]),
@@ -58629,7 +58804,7 @@ var render = function () {
                       "router-link",
                       {
                         staticClass: "py-0 mr-1 btn btn-info",
-                        attrs: { to: "/edit-category/" + cats.id },
+                        attrs: { to: "/edit-product/" + cats.id },
                       },
                       [_vm._v("Edit")]
                     ),
@@ -58660,7 +58835,36 @@ var render = function () {
     ),
   ])
 }
-var staticRenderFns = []
+var staticRenderFns = [
+  function () {
+    var _vm = this
+    var _h = _vm.$createElement
+    var _c = _vm._self._c || _h
+    return _c("thead", [
+      _c("tr", [
+        _c("th", [_vm._v("SL")]),
+        _vm._v(" "),
+        _c("th", [_vm._v("Product Name ")]),
+        _vm._v(" "),
+        _c("th", [_vm._v("Brand ")]),
+        _vm._v(" "),
+        _c("th", [_vm._v("Category ")]),
+        _vm._v(" "),
+        _c("th", [_vm._v("Desc ")]),
+        _vm._v(" "),
+        _c("th", [_vm._v("Price ")]),
+        _vm._v(" "),
+        _c("th", [_vm._v("Qty ")]),
+        _vm._v(" "),
+        _c("th", [_vm._v("Image ")]),
+        _vm._v(" "),
+        _c("th", [_vm._v("Status")]),
+        _vm._v(" "),
+        _c("th", { staticClass: "text-center" }, [_vm._v("Actions")]),
+      ]),
+    ])
+  },
+]
 render._withStripped = true
 
 

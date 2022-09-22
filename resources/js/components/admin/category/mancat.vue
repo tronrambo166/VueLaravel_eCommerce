@@ -11,7 +11,7 @@
 
 
 		
-		<th> <input class=" mt-2 float-left" type="checkbox"  v-model="catIds"/> Index</th>
+		<th> <input class=" mt-2 float-left" type="checkbox" @click="selectAll"  v-model="catsAll"/> Index</th>
 			<th>Category Name </th>
 			<th>Status</th>
 			
@@ -40,6 +40,7 @@
 		<td v-if="empCat()" > No data found! </td>
 	
 	</tbody> 
+	<button :disabled="!isSelected" @click="removeCats(catIds)"  class=" btn btn-warning">Delete</button>
 	
 	
 </table>
@@ -54,6 +55,8 @@ export default {
 	data: () => ({
 	category:{},
 	catIds:[],
+	catsAll:false,
+	isSelected:false,
 	emptyCat:false
 	}),
 	methods:{
@@ -96,8 +99,22 @@ export default {
   }
 })
 
- 
+  },
+  removeCats(ids){
+  axios.post('http://localhost/laravel_projects/Vue_eCommerce/public/delcats',{ids:ids}).then( (data) =>{
+  console.log(data)
+   toastr.success(data.data.message)
+              }).catch( (error) =>{})
+   this.$store.dispatch("getCats")
+  },
 
+  selectAll(event){
+  if(this.catsAll === false){
+  this.allcategory.forEach( (event) =>{
+  this.catIds.push(event.id)
+  })
+  }
+  else  this.catIds = [];
   },
   empCat(){
   if(this.$store.state.catData.length<1) this.emptyCat = true;
@@ -111,6 +128,9 @@ export default {
 
 	 computed:{ 
       allcategory(){  return this.$store.getters.getCat }
+	 },
+	 watch:{
+	 catIds(){ if(this.catIds.length > 0) this.isSelected=true; }
 	 }
 
 	 
